@@ -9,21 +9,9 @@ RS = %00100000
 
   .org $8000
 
-enable:
-  lda #0         ; Clear RS/RW/E bits
-  sta PORTA
-  lda #E         ; Set E bit to send instruction
-  sta PORTA
-  lda #0         ; Clear RS/RW/E bits
-  sta PORTA
 
-datawrite:
-  lda #RS         ; Set RS; Clear RW/E bits
-  sta PORTA
-  lda #(RS | E)   ; Set E bit to send instruction
-  sta PORTA
-  lda #RS         ; Clear E bits
-  sta PORTA
+
+
 
 reset:
   lda #%11111111 ; Set all pins on port B to output
@@ -33,71 +21,76 @@ reset:
   sta DDRA
 
   lda #%00111000 ; Set 8-bit mode; 2-line display; 5x8 font
-  sta PORTB
-  .word enable
+  jsr enable
 
   lda #%00001110 ; Display on; cursor on; blink off
-  sta PORTB
-  .word enable
+  jsr enable
 
   lda #%00000110 ; Increment and shift cursor; don't shift display
-  sta PORTB
-  .word enable
+  jsr enable
 
   lda #"H"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"e"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"l"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"l"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"o"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #","
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #" "
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"w"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"o"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"r"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"l"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"d"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
   lda #"!"
-  sta PORTB
-  .word datawrite
+  jsr datawrite
 
 loop:
   jmp loop
+
+enable: ; call pha and pla to push/pull from stack if a reg value is important
+  
+  sta PORTB
+  lda #0         ; Clear RS/RW/E bits
+  sta PORTA
+  lda #E         ; Set E bit to send instruction
+  sta PORTA
+  lda #0         ; Clear RS/RW/E bits
+  sta PORTA
+  rts 
+
+datawrite:
+  sta PORTB
+  lda #RS         ; Set RS; Clear RW/E bits
+  sta PORTA
+  lda #(RS | E)   ; Set E bit to send instruction
+  sta PORTA
+  lda #RS         ; Clear E bits
+  sta PORTA
+  rts
 
   .org $fffc
   .word reset
