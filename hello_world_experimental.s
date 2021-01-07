@@ -14,6 +14,9 @@ RS = %00100000
 
 
 reset:
+  ldx #$ff
+  txs
+  
   lda #%11111111 ; Set all pins on port B to output
   sta DDRB
 
